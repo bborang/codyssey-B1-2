@@ -1,21 +1,42 @@
 import { Link, useParams } from 'react-router'
+import BookCover from '../components/BookCover.jsx'
+import StatusBadge from '../components/StatusBadge.jsx'
+import LinkButton from '../components/LinkButton.jsx'
+import ResourceList from '../components/ResourceList.jsx'
+import SectionHeading from '../components/SectionHeading.jsx'
+import EmptyState from '../components/EmptyState.jsx'
+import { books } from '../lib/books.js'
+import { authors } from '../lib/authors.js'
 import NotFoundPage from './NotFoundPage.jsx'
 
 export default function BookDetailPage() {
   const { id } = useParams()
-  // 이번 단계에서는 화면 이동을 확인할 예시 주소 한 개만 제공합니다.
-  if (id !== 'masquerade') return <NotFoundPage />
+  const book = books.find((item) => item.id === id)
+  if (!book) return <NotFoundPage />
+  const author = authors.find((item) => item.id === book.authorId)
 
   return (
     <section>
       <Link to="/books">← 나의 책장</Link>
-      <h1>가면무도회</h1>
-      <p className="introduction"><Link to="/authors/lermontov">미하일 레르몬토프</Link> · 희곡</p>
-      <div className="page-notice">
-        <h2>책 소개와 함께 보는 자료</h2>
-        <p>화면 이동을 위한 예시입니다. 상세 내용과 독서 기록은 다음 단계에서 채워집니다.</p>
-        <Link className="button-link" to={`/books/${id}/edit`}>책 수정 화면으로</Link>
+      <div className="book-detail-header">
+        <BookCover title={book.title} author={author.name} genre={book.genre} color={book.color} />
+        <div>
+          <p className="eyebrow">{book.genre}</p>
+          <h1>{book.title}</h1>
+          <p className="detail-author"><Link to={`/authors/${author.id}`}>{author.name}</Link></p>
+          <StatusBadge status={book.status} />
+          <div className="page-actions"><LinkButton to={`/books/${book.id}/edit`}>책 수정 화면으로</LinkButton></div>
+        </div>
       </div>
+      <p className="sample-notice">예시 데이터 · 감상과 질문 메모는 실제 작성 기록이 아닙니다.</p>
+      <section className="detail-section" aria-label="이 책과 나">
+        <SectionHeading title="이 책과 나" />
+        {book.note ? <p className="reading-note">{book.note}</p> : <EmptyState title="아직 남긴 기록이 없어요" description="읽게 된 계기나 읽고 난 뒤의 생각을 남길 자리입니다." />}
+      </section>
+      <section className="detail-section" aria-label="함께 보는 자료">
+        <SectionHeading title="함께 보는 자료" count={book.resources.length} description="검색했던 궁금함을, 여기에서 다시." />
+        <ResourceList resources={book.resources} />
+      </section>
     </section>
   )
 }
