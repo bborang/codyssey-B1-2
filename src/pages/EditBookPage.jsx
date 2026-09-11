@@ -1,8 +1,7 @@
 import { Link, useParams } from 'react-router'
-import { books } from '../lib/books.js'
 import NotFoundPage from './NotFoundPage.jsx'
 
-export default function EditBookPage() {
+export default function EditBookPage({ books }) {
   const { id } = useParams()
   const book = books.find((item) => item.id === id)
   if (!book) return <NotFoundPage />

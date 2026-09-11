@@ -2,10 +2,9 @@ import { Link, useParams } from 'react-router'
 import BookList from '../components/BookList.jsx'
 import PageHeading from '../components/PageHeading.jsx'
 import { authors } from '../lib/authors.js'
-import { books } from '../lib/books.js'
 import NotFoundPage from './NotFoundPage.jsx'
 
-export default function AuthorBooksPage() {
+export default function AuthorBooksPage({ books }) {
   const { authorId } = useParams()
   const author = authors.find((item) => item.id === authorId)
   if (!author) return <NotFoundPage />
