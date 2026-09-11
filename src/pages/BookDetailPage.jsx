@@ -29,7 +29,7 @@ export default function BookDetailPage({ books, onStatusChange }) {
           <div className="page-actions"><LinkButton to={`/books/${book.id}/edit`}>책 수정 화면으로</LinkButton></div>
         </div>
       </div>
-      <p className="sample-notice">예시 데이터 · 상태 변경은 화면 이동 중 유지되며 새로고침하면 초기화됩니다. 감상과 질문 메모는 예시입니다.</p>
+      <p className="sample-notice">임시 저장 단계 · 등록·수정한 내용은 새로고침하면 초기화됩니다. {!book.isUserEdited && '감상과 질문 메모는 예시입니다.'}</p>
       <section className="detail-section" aria-label="이 책과 나">
         <SectionHeading title="이 책과 나" />
         {book.note ? <p className="reading-note">{book.note}</p> : <EmptyState title="아직 남긴 기록이 없어요" description="읽게 된 계기나 읽고 난 뒤의 생각을 남길 자리입니다." />}

@@ -24,6 +24,20 @@ export default function App() {
     )))
   }
 
+  // 원격 저장 전, 제출 중 UI를 체험하기 위한 350ms의 모의 대기입니다.
+  async function createBook(values) {
+    const id = crypto.randomUUID()
+    await new Promise((resolve) => setTimeout(resolve, 350))
+    setBooks((previous) => [...previous, { ...values, id, color: '#5d684f', resources: [], isUserEdited: true }])
+    return id
+  }
+
+  async function updateBook(id, values) {
+    if (!books.some((book) => book.id === id)) throw new Error('Book not found')
+    await new Promise((resolve) => setTimeout(resolve, 350))
+    setBooks((previous) => previous.map((book) => book.id === id ? { ...book, ...values, isUserEdited: true } : book))
+  }
+
   return (
     <Routes>
       {/* 공통 레이아웃의 Outlet 자리에 URL과 일치하는 페이지가 표시됩니다. */}
@@ -32,9 +46,9 @@ export default function App() {
         <Route path="books" element={<BooksPage books={books} />} />
         <Route path="authors" element={<AuthorsPage />} />
         <Route path="authors/:authorId" element={<AuthorBooksPage books={books} />} />
-        <Route path="books/new" element={<NewBookPage />} />
+        <Route path="books/new" element={<NewBookPage onCreateBook={createBook} />} />
         <Route path="books/:id" element={<BookDetailPage books={books} onStatusChange={changeReadingStatus} />} />
-        <Route path="books/:id/edit" element={<EditBookPage books={books} />} />
+        <Route path="books/:id/edit" element={<EditBookPage books={books} onUpdateBook={updateBook} />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
