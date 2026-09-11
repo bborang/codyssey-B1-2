@@ -1,3 +1,4 @@
+import { isRemote } from '../lib/supabase.js'
 import { useState } from 'react'
 import BookList from '../components/BookList.jsx'
 import BookFilters from '../components/BookFilters.jsx'
@@ -32,7 +33,7 @@ export default function BooksPage({ books }) {
         <PageHeading eyebrow="나의 책장" title="책과 함께 모은 이야기" description="읽은 책과 읽고 싶은 책을 한곳에 모아보세요." />
         <LinkButton to="/books/new">＋ 책 등록</LinkButton>
       </div>
-      <p className="sample-notice">임시 책장 · 등록·수정한 내용은 새로고침하면 초기화됩니다.</p>
+      <p className="sample-notice">{isRemote ? 'Supabase 책장 · 원격 조회 연결' : '임시 책장 · 등록·수정한 내용은 새로고침하면 초기화됩니다.'}</p>
       <BookFilters query={query} authorId={authorId} status={status} authors={authors}
         onQueryChange={setQuery} onAuthorChange={setAuthorId} onStatusChange={setStatus} onReset={resetFilters} />
       <p className="result-count" role="status">전체 {books.length}권 중 {filteredBooks.length}권</p>

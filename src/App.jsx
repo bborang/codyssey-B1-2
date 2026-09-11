@@ -1,3 +1,7 @@
+import useBooks from './hooks/useBooks.js'
+import { isRemote, dataSource } from './lib/supabase.js'
+import BooksQueryBoundary from './components/BooksQueryBoundary.jsx'
+import RemoteReadOnly from './components/RemoteReadOnly.jsx'
 import { useState } from 'react'
 import { books as initialBooks } from './lib/books.js'
 import { readingStatuses } from './lib/readingStatuses.js'
@@ -14,7 +18,9 @@ import NotFoundPage from './pages/NotFoundPage.jsx'
 
 export default function App() {
   // 여러 페이지가 함께 사용하는 책 상태는 공통 부모인 App에 둡니다.
-  const [books, setBooks] = useState(initialBooks)
+  const [demoBooks, setBooks] = useState(initialBooks)
+  const remote = useBooks(isRemote)
+  const books = isRemote ? (remote.data || []) : demoBooks
 
   function changeReadingStatus(id, status) {
     if (!readingStatuses.includes(status)) return
@@ -43,12 +49,14 @@ export default function App() {
       {/* 공통 레이아웃의 Outlet 자리에 URL과 일치하는 페이지가 표시됩니다. */}
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="books" element={<BooksPage books={books} />} />
-        <Route path="authors" element={<AuthorsPage />} />
-        <Route path="authors/:authorId" element={<AuthorBooksPage books={books} />} />
-        <Route path="books/new" element={<NewBookPage onCreateBook={createBook} />} />
-        <Route path="books/:id" element={<BookDetailPage books={books} onStatusChange={changeReadingStatus} />} />
-        <Route path="books/:id/edit" element={<EditBookPage books={books} onUpdateBook={updateBook} />} />
+        <Route element={<BooksQueryBoundary loading={remote.loading} error={['demo', 'supabase'].includes(dataSource) ? remote.error : 'VITE_DATA_SOURCE는 demo 또는 supabase로 설정해주세요.'} onRetry={remote.retry} />}>
+          <Route path="books" element={<BooksPage books={books} />} />
+          <Route path="authors" element={<AuthorsPage />} />
+          <Route path="authors/:authorId" element={<AuthorBooksPage books={books} />} />
+          <Route path="books/new" element={isRemote ? <RemoteReadOnly title="책 등록" /> : <NewBookPage onCreateBook={createBook} />} />
+          <Route path="books/:id" element={<BookDetailPage books={books} onStatusChange={changeReadingStatus} />} />
+          <Route path="books/:id/edit" element={isRemote ? <RemoteReadOnly title="책 수정" /> : <EditBookPage books={books} onUpdateBook={updateBook} />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
